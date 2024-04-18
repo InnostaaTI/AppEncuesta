@@ -78,6 +78,7 @@ namespace AppEncuesta.DAO
             <p><b>Alimentos: </b>" + respuesta(of.Pregunta6) + @"</p>
            <p><b>CheckOut: </b>" + respuesta(of.Pregunta7) + @"</p>
             <p><b>Comentarios: </b>" + of.Comentarios + @"</p>
+            <p><b>Correo cliente: </b> </p>
            
         </div>
         <div class=""card-footer"">
