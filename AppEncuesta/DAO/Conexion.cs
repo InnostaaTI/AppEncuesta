@@ -23,7 +23,7 @@ namespace AppEncuesta.DAO
 
             string conexion = traeConexion();
             string valor = "";
-            string query = $"SELECT LineaConexion  FROM Conexion_Segmentos WHERE SEG = " + Codhotel;
+            string query = $"SELECT LineaConexion  FROM Conexion_Segmentos WHERE SEG = '" + Codhotel + "'";
 
             using (SqlConnection connection = new SqlConnection(conexion))
             {

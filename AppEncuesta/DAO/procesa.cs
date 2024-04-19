@@ -231,7 +231,7 @@ namespace AppEncuesta.DAO
             DAO.Conexion cn = new Conexion();
              string conexion = cn.traeConexionSegmento(Codhotel);
            
-            string query = $"SELECT EMAIL  FROM [V_Huespedes_y_Reservaciones] WHERE FOLIO = " + Folio;
+            string query = $"SELECT EMAIL  FROM [V_Huespedes_y_Reservaciones] WHERE FOLIO = '" + Folio + "'";
 
             using (SqlConnection connection = new SqlConnection(conexion))
             {
