@@ -3,6 +3,7 @@ using AppEncuesta.Models;
 using Newtonsoft.Json;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 
 namespace AppEncuesta.DAO
 {
@@ -17,9 +18,9 @@ namespace AppEncuesta.DAO
             Models.Correo datosCorreo = new Models.Correo();
 
             Servicio.EnviaCorreo enviaCorreo = new Servicio.EnviaCorreo();
-
+            DAO.Conexion conexion = new DAO.Conexion();
             string hotel = of.idPropiedad.ToString() == "1" ? "BOUTIQUE HOTEL" : "APARTHOTEL";
-
+            string correo = traeCorreo(of.idPropiedad, of.Folio);
             datosCorreo.Cc = "";
             datosCorreo.Bco = "";
             datosCorreo.To = "";
@@ -78,7 +79,8 @@ namespace AppEncuesta.DAO
             <p><b>Alimentos: </b>" + respuesta(of.Pregunta6) + @"</p>
            <p><b>CheckOut: </b>" + respuesta(of.Pregunta7) + @"</p>
             <p><b>Comentarios: </b>" + of.Comentarios + @"</p>
-            <p><b>Correo cliente: </b> </p>
+            <p><b>Correo cliente: </b>" + correo + @"</p>
+            
            
         </div>
         <div class=""card-footer"">
@@ -94,14 +96,9 @@ namespace AppEncuesta.DAO
 
             string jsonDatos = "{}";
             string query = "";
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            string connectionString = configuration.GetConnectionString("DefaultConnection");
+            
             // Define una clase que herede de DbContext para acceder a la base de datos
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(conexion.traeConexion()))
             {
                 try
                 {
@@ -124,6 +121,8 @@ namespace AppEncuesta.DAO
 
                 }
             }
+
+
             DateTime fechaLarga = Convert.ToDateTime(DateTime.Now.ToString("dd-MM-yyyy"));
             try
             {
@@ -162,7 +161,7 @@ namespace AppEncuesta.DAO
 
                 query = "SP_grabaEncuesta";
                 decimal idRespuesta = 0;
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(conexion.traeConexion()))
                 {
                     SqlCommand cmd = new SqlCommand(query, connection);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -178,6 +177,7 @@ namespace AppEncuesta.DAO
                     cmd.Parameters.Add(new SqlParameter("@Comentarios", comen));
                     cmd.Parameters.Add(new SqlParameter("@fecha", fechaLarga));
                     cmd.Parameters.Add(new SqlParameter("@Folio", of.Folio));
+                    cmd.Parameters.Add(new SqlParameter("@Correo", correo));
                     connection.Open();
                     cmd.ExecuteNonQuery();
 
@@ -222,7 +222,38 @@ namespace AppEncuesta.DAO
 
         }
 
+        public string traeCorreo(string propiedad,string Folio)
+        {
+            string valor = "N/A";
+            try
+            {
+                string Codhotel = propiedad == "1" ? "073" : "074";
+            DAO.Conexion cn = new Conexion();
+             string conexion = cn.traeConexionSegmento(Codhotel);
+           
+            string query = $"SELECT EMAIL  FROM [V_Huespedes_y_Reservaciones] WHERE FOLIO = " + Folio;
 
+            using (SqlConnection connection = new SqlConnection(conexion))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+
+               
+                    connection.Open();
+                    object result = command.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        valor = result.ToString();
+                    }
+                          }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+            return valor;
+        }
 
         static bool EsNumerico(string input)
         {
