@@ -41,8 +41,17 @@ namespace AppEncuesta.DAO.Servicio
                 email.Subject = correoen.Subject;//Asunto del correo
                 if (emailBcc != string.Empty)
                     email.Bcc.Add(MailboxAddress.Parse(emailBcc));
+
                 if (emailCc != string.Empty)
-                    email.Cc.Add(MailboxAddress.Parse(emailCc));
+                {
+                    var ccAddresses = emailCc.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var cc in ccAddresses)
+                    {
+                        email.Cc.Add(MailboxAddress.Parse(cc.Trim()));
+                    }
+                }
+                //if (emailCc != string.Empty)
+                //    email.Cc.Add(MailboxAddress.Parse(emailCc));
 
                 email.Body = new TextPart(TextFormat.Html)//Contenido que tendra el correo
                 {
